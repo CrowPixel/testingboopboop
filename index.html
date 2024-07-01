@@ -1,14 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beep</title>
-    <link rel="stylesheet" href="style.css">
+  <title>Rhythm Game</title>
+  <style>
+    /* Add your CSS styles here */
+    .game-container {
+      width: 800px;
+      height: 600px;
+      margin: auto;
+      background-color: #000;
+      overflow: hidden;
+      position: relative;
+    }
+    .note {
+      width: 50px;
+      height: 50px; /* Make it a circle */
+      border-radius: 50%; /* Make it a circle */
+      background-color: #800080; /* Purple color */
+      position: absolute;
+      bottom: -50px; /* Start just outside of the game container */
+      cursor: pointer; /* Change cursor to indicate clickable */
+    }
+    .glow {
+      box-shadow: 0 0 20px #9b30ff; /* Bright purple glow */
+    }
+    #editorButton {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Testing Shit Sucks!</h1>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <script src="script.js"></script>
+  <div class="game-container" id="gameContainer">
+    <!-- Notes will be dynamically added here -->
+  </div>
+  <button id="editorButton">Level Editor</button>
+
+  <script>
+    // Your JavaScript code will go here
+    document.addEventListener('DOMContentLoaded', (event) => {
+      // Start the game when the DOM is fully loaded
+      startGame();
+      document.getElementById('editorButton').addEventListener('click', enterLevelEditor);
+    });
+
+    function createNote(xPosition) {
+      // Function to create a new note element
+      var note = document.createElement('div');
+      note.classList.add('note');
+      note.style.left = xPosition + 'px';
+      document.getElementById('gameContainer').appendChild(note);
+      // Animate the note
+      moveNote(note);
+      // Add click event for the note
+      note.addEventListener('click', function() {
+        note.classList.add('glow');
+        setTimeout(function() { note.classList.remove('glow'); }, 100); // Remove glow after 100ms
+      });
+    }
+
+    function moveNote(note) {
+      // Function to move the note
+      var gameContainerHeight = document.getElementById('gameContainer').offsetHeight;
+      var noteSpeed = 2; // Adjust this value to change the speed of the notes
+      var moveNoteInterval = setInterval(function() {
+        var currentBottom = parseInt(note.style.bottom, 10);
+        if (currentBottom < gameContainerHeight) {
+          note.style.bottom = currentBottom + noteSpeed + 'px';
+        } else {
+          // Remove the note if it moves out of the game container
+          note.remove();
+          clearInterval(moveNoteInterval);
+        }
+      }, 10);
+    }
+
+    function startGame() {
+      // Function to start the game
+      setInterval(function() {
+        createNote(Math.random() * (document.getElementById('gameContainer').offsetWidth - 50));
+        createNote(Math.random() * (document.getElementById('gameContainer').offsetWidth - 50));
+      }, 1000); // Adjust this value to change how frequently notes are created
+    }
+
+    function enterLevelEditor() {
+      // Function to enter the level editor
+      var editorContainer = document.createElement('div');
+      editorContainer.id = 'editorContainer';
+      editorContainer.style.width = '800px';
+      editorContainer.style.height = '600px';
+      editorContainer.style.background = '#333';
+      editorContainer.style.position = 'relative';
+      editorContainer.style.margin = 'auto';
+      editorContainer.style.cursor = 'crosshair';
+      document.body.appendChild(editorContainer);
+
+      editorContainer.addEventListener('click', function(event) {
+        var xPosition = event.pageX - editorContainer.offsetLeft;
+        var yPosition = event.pageY - editorContainer.offsetTop;
+        createNoteInEditor(xPosition, yPosition);
+      });
+    }
+
+    function createNoteInEditor(x, y) {
+      // Function to create a note in the level editor
+      var note = document.createElement('div');
+      note.classList.add('note');
+      note.style.left = x + 'px';
+      note.style.bottom = y + 'px';
+      document.getElementById('editorContainer').appendChild(note);
+    }
+  </script>
 </body>
 </html>
